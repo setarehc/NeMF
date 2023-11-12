@@ -1,6 +1,6 @@
 # Saved folders
-prior/
-results/
+prior
+results
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
