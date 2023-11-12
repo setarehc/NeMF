@@ -173,7 +173,7 @@ class Architecture(BaseModel):
 
         self.recon_data.clear()
         self.recon_data = self.decode(z_l, z_g, length=self.args.data.clip_length, step=step)
-
+        
         self.recon_data['mu_l'] = mu_l
         self.recon_data['logvar_l'] = logvar_l
         if self.args.data.root_transform:
@@ -188,7 +188,7 @@ class Architecture(BaseModel):
         t = torch.arange(start=0, end=length, step=step).unsqueeze(0)  # (1, T)
         t = t / self.args.data.clip_length * 2 - 1  # map t to [-1, 1]
         t = t.expand(b_size, -1).unsqueeze(-1).to(self.device)  # (B, T, 1)
-        local_motion, global_motion = self.field(t, z_l, z_g)  # (B, T, N)
+        local_motion, global_motion = self.field(t, z_l, z_g)  # (B, T, N) locl_motion B,T,144 and global_motion B,T,6
 
         rot6d_recon = local_motion[:, :, :n_joints * 6].contiguous()  # (B, T, J x 6)
         rot6d_recon = rot6d_recon.view(b_size, -1, n_joints, 6)  # (B, T, J, 6)
@@ -231,6 +231,7 @@ class Architecture(BaseModel):
             trans = compute_trajectory(root_vel, root_height, origin, dt, up_axis=self.args.data.up)
             output['trans'] = trans
         elif self.args.pretrained_gmp:
+            print("Pretrained GMP is used.")
             local_rotmat = local_rotmat.view(b_size, -1, n_joints, 3, 3)  # (B, T, J, 3, 3)
             if self.args.data.root_transform:
                 root_orient_rotmat = rotation_6d_to_matrix(output['root_orient'])  # (B, T, 3, 3)

@@ -144,7 +144,7 @@ class GlobalMotionPredictor(BaseModel):
 
     def forward(self):
         self.pred_data.clear()
-        self.input_data['origin'] = self.input_data['trans'][:, 0]
+        self.input_data['origin'] = self.input_data['trans'][:, 0] # (B, 3) xyz at t=0
         self.pred_data = self.predict(data=self.input_data, dt=1.0 / self.args.data.fps)
 
     def predict(self, data, dt):

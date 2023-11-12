@@ -235,7 +235,7 @@ def run_interpolation():
 def motion_reconstruction(target, output_dir, steps, T=None, offset=0):
     if args.initialization:
         z_l, _, _ = model.encode_local()
-        if args.data.root_transform:
+        if args.data.root_transform: # True
             z_g, _, _ = model.encode_global()
         else:
             z_g = None
@@ -308,7 +308,7 @@ def run_motion_reconstruction():
     os.makedirs(output_dir, exist_ok=True)
     errors = dict()
     for data in data_loader:
-        model.set_input(data)
+        model.set_input(data) # generative dict_keys(['trans', 'pos', 'angular', 'contacts', 'root_vel', 'velocity', 'global_xform', 'root_orient', 'rotmat'])
         target = dict()
         target['pos'] = data['pos'].to(model.device)
         target['rotmat'] = rotation_6d_to_matrix(data['global_xform'].to(model.device))
@@ -390,8 +390,10 @@ def slerp_initialization(data, T, mask):
 def run_motion_inbetweening():
     output_dir = os.path.join(opt.save_path, 'motion_inbetweening', datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))
 
-    clip_inbetweens = [10, 20, 30]
-    keyframe_inbetweens = [5, 10, 15, 20]
+    # clip_inbetweens = [10, 20, 30]
+    # keyframe_inbetweens = [5, 10, 15, 20]
+    clip_inbetweens = [10]
+    keyframe_inbetweens = []
 
     for interval in clip_inbetweens:
         sub_folder_dir = os.path.join(output_dir, f'clip_{interval}')
@@ -910,7 +912,7 @@ if __name__ == '__main__':
     print(f'Number of GPUs: {ngpu}')
 
     if opt.task != 'motion_renavigating':
-        dataset = AMASS(dataset_dir=os.path.join(args.dataset_dir, 'test'))
+        dataset = AMASS(dataset_dir=os.path.join(args.dataset_dir, 'test')) #./data/amass/generative
         data_loader = DataLoader(dataset, batch_size=ngpu * args.batch_size, num_workers=args.num_workers, shuffle=False,
                                  pin_memory=True, drop_last=True if opt.task == 'latent_interpolation' else False)
     else:
